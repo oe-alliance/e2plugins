@@ -1,3 +1,4 @@
+from . import _
 from Plugins.Plugin import PluginDescriptor
 from Components.PluginComponent import plugins
 from Screens.Screen import Screen
@@ -8,7 +9,7 @@ from Components.Label import Label, MultiColorLabel
 from Components.Button import Button
 from Components.MenuList import MenuList
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, ConfigSubsection, ConfigPosition, getConfigListEntry, ConfigBoolean, ConfigInteger, ConfigText, ConfigSelection, configfile, NoSave
+from Components.config import config, ConfigSubsection, ConfigYesNo, ConfigPosition, getConfigListEntry, ConfigBoolean, ConfigInteger, ConfigText, ConfigSelection, configfile, NoSave
 from Components.Sources.StaticText import StaticText
 from Components.Task import Task
 from enigma import eTimer, eServiceReference, iPlayableService, iServiceInformation, getDesktop, eRCInput, eServiceCenter, fbClass
@@ -31,6 +32,9 @@ from stalker import StalkerTVWindow
 
 config.misc.stalker = ConfigSubsection()
 config.misc.stalker.portal = ConfigText(default = 'http://')
+config.misc.stalker.showinplugins = ConfigYesNo(default = False)
+config.misc.stalker.showinextensions = ConfigYesNo(default = True)
+config.misc.stalker.showinmenu = ConfigYesNo(default = False)
 
 class StalkerEdit(Screen, ConfigListScreen):
 	skin = """
@@ -52,14 +56,20 @@ class StalkerEdit(Screen, ConfigListScreen):
 		self.list = []
 		ConfigListScreen.__init__(self, self.list,session = self.session)
 
+		self.stalker = config.misc.stalker
 		self.urlConfigEntry = NoSave(ConfigText(default = config.misc.stalker.portal.value, visible_width = 50, fixed_size = False))
-		self.urlEntry = getConfigListEntry(_("Portal url"), self.urlConfigEntry)
+		self.urlEntry = getConfigListEntry(_("Portal URL"), self.urlConfigEntry)
 		self.list.append(self.urlEntry)
+		self.cfg_showinextensions = getConfigListEntry(_("Show Stalker in Extensions"), self.stalker.showinextensions)
+		self.cfg_showinmenu = getConfigListEntry(_("Show Stalker in Mainmenu"), self.stalker.showinmenu)
+		self.cfg_showinplugins = getConfigListEntry(_("Show Stalker in Plugins"), self.stalker.showinplugins)
+		self.list.append(self.cfg_showinextensions)
+		self.list.append(self.cfg_showinmenu)
+		self.list.append(self.cfg_showinplugins)
 
 		addrs = netifaces.ifaddresses('eth0')
-		if_mac = addrs[netifaces.AF_LINK][0]['addr']
-		self["mac"] = StaticText()
-		self["mac"].setText(_("MAC: ") + if_mac)
+		if_mac = str(addrs[netifaces.AF_LINK][0]['addr'])
+		self["mac"] = StaticText(_("MAC: %s")% if_mac)
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
@@ -91,9 +101,49 @@ def main(session, **kwargs):
 	height = info and info.getInfo(iServiceInformation.sVideoHeight) or -1
 	session.open(StalkerTVWindow, width, height)
 
+def startMenu(menuid):
+	if menuid != "mainmenu":
+		return []
+
+	return [(_("Stalker"), main, "Stalker Plugin", 80)]
+
+
+def extensionsmenu(session, **kwargs):
+	main(session, **kwargs)
+
+def setExtensionsmenu(el):
+	try:
+		if el.value:
+			Components.PluginComponent.plugins.addPlugin(extDescriptor)
+		else:
+			Components.PluginComponent.plugins.removePlugin(extDescriptor)
+	except Exception, e:
+		print "[Stalker] Failed to update extensions menu:", e
+
+config.misc.stalker.showinextensions.addNotifier(setExtensionsmenu, initial_call = False, immediate_feedback = False)
+extDescriptor = PluginDescriptor(name= _("Stalker"), description = _("Stalker"), where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main)
+pluginlist = PluginDescriptor(name=_("Stalker"), description = _("Stalker"), where = PluginDescriptor.WHERE_PLUGINMENU, icon = 'stalker_HD.png', fnc = main)
+menulist = PluginDescriptor(name=_("Stalker"), description = _("Stalker"), where = PluginDescriptor.WHERE_MENU, fnc = startMenu)
+
 def Plugins(**kwargs):
-	menus = []
-	menus.append(PluginDescriptor(name='Stalker', description='Stalker Plugin', where=PluginDescriptor.WHERE_EXTENSIONSMENU, icon='', fnc=main))
-	menus.append(PluginDescriptor(name='Stalker Setup', description='Stalker Setup', where=PluginDescriptor.WHERE_EXTENSIONSMENU, icon='', fnc=setup))
-	menus.append(PluginDescriptor(name='Stalker Setup', description='Stalker Setup', where=PluginDescriptor.WHERE_PLUGINMENU, icon='stalker.png', fnc=setup))
-	return menus
+	from enigma import getDesktop
+	if getDesktop(0).size().width() <= 1280:
+		stalker = 'stalker_HD.png'
+	else:
+		stalker = 'stalker_FHD.png'
+
+	result = [
+		PluginDescriptor(
+			name=_('Stalker Setup'), 
+			description=_('Stalker Setup'), 
+			where = PluginDescriptor.WHERE_PLUGINMENU, 
+			icon=stalker, 
+			fnc=setup),
+	]
+	if config.misc.stalker.showinextensions.value:
+		result.append(extDescriptor)
+	if config.misc.stalker.showinplugins.value:
+		result.append(pluginlist)
+	if config.misc.stalker.showinmenu.value:
+		result.append(menulist)
+	return result
