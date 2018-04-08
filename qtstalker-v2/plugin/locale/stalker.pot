@@ -26,7 +26,7 @@ msgstr ""
 msgid "Show Stalker in Mainmenu"
 msgstr ""
 
-msgid "Show Stalker in Plugins"
+msgid "Start Stalker with enigma2 (Autostart)"
 msgstr ""
 
 msgid "Cancel"
@@ -35,5 +35,11 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-msgid ""
+msgid "Load Settings"
+msgstr ""
+
+msgid "Set this portal as default?"
+msgstr ""
+
+msgid "Install Stalker config?"
 msgstr ""
