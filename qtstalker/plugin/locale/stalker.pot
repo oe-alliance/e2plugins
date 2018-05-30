@@ -43,3 +43,6 @@ msgstr ""
 
 msgid "Install Stalker config?"
 msgstr ""
+
+msgid "Enable Stalker ministra support with unigue boxkey"
+msgstr ""

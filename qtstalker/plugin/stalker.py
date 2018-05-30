@@ -91,7 +91,8 @@ class StalkerTVWindow(Screen):
 
 	def serviceEOF(self):
 		self.serviceStopped()
-		browserinstance.sendCommand(1002)
+		if config.plugins.Stalker.boxkey.value == False:
+			browserinstance.sendCommand(1002)
 
 	def serviceStopped(self):
 		if self.mediastate == 1:

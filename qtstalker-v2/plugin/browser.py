@@ -2,6 +2,7 @@ import os
 import struct
 from enigma import eConsoleAppContainer, getDesktop
 from Components.VolumeControl import VolumeControl
+from Components.config import config
 import datasocket
 
 
@@ -28,7 +29,10 @@ class Browser:
 			datasocket.onCommandReceived.append(self.onCommandReceived)
 			datasocket.onBrowserClosed.append(self.onBrowserClosed)
 			container = eConsoleAppContainer()
-			container.execute("export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb/0; /usr/bin/stalker")
+			if config.plugins.Stalker.boxkey.value == True:
+				container.execute("export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb/0; /usr/bin/stalker-mac")
+			else:
+				container.execute("export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb/0; /usr/bin/stalker")
 
 	def stop(self):
 		if self.commandserver:
@@ -75,4 +79,7 @@ class Browser:
 		self.sendCommand(1000, url)
 
 	def StopMediaPlayback(self):
-		self.sendCommand(5)
+		if config.plugins.Stalker.boxkey.value == True:
+			self.sendCommand(1002)
+		else:
+			self.sendCommand(5)

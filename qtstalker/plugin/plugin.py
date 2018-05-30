@@ -24,6 +24,7 @@ config.plugins.Stalker.ntpurl = ConfigText(default = '')
 config.plugins.Stalker.showinextensions = ConfigYesNo(default = True)
 config.plugins.Stalker.showinmenu = ConfigYesNo(default = False)
 config.plugins.Stalker.autostart = ConfigYesNo(default = False)
+config.plugins.Stalker.boxkey = ConfigYesNo(default = False)
 config.plugins.Stalker.preset = ConfigInteger(default = 0)
 config.plugins.Stalker.presets = ConfigSubList()
 NUMBER_OF_PRESETS = 6
@@ -59,7 +60,10 @@ class StalkerEdit(Screen, ConfigListScreen):
 
 		self.loadPortals()
 		addrs = netifaces.ifaddresses('eth0')
-		if_mac = str(addrs[netifaces.AF_LINK][0]['addr'])
+		if config.plugins.Stalker.boxkey.value == True:
+			if_mac = "00:1a:79" + str(addrs[netifaces.AF_LINK][0]['addr'][8:])
+		else:
+			if_mac = str(addrs[netifaces.AF_LINK][0]['addr'])
 		self["mac"] = StaticText(_("MAC: %s")% if_mac)
 
 		self["HelpWindow"] = Pixmap()
@@ -167,6 +171,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 			else:
 				self.list.append(getConfigListEntry(_("Portal URL") + (" %d" % (x + 1)), self.name[x]))
 		self.list.append(getConfigListEntry(_("Start Stalker with enigma2 (Autostart)"), config.plugins.Stalker.autostart))
+		self.list.append(getConfigListEntry(_("Enable Stalker ministra support with unigue boxkey"), config.plugins.Stalker.boxkey))
 		self.list.append(getConfigListEntry(_("Show Stalker in Extensions"), config.plugins.Stalker.showinextensions))
 		self.list.append(getConfigListEntry(_("Show Stalker in Mainmenu"), config.plugins.Stalker.showinmenu))
 		self["config"].list = self.list
@@ -209,7 +214,7 @@ def timerCallback():
 	top = open("/proc/stb/fb/dst_top", "r").read()
 	height = open("/proc/stb/fb/dst_height", "r").read()
 
-	if True: #datetime.datetime.now().year < 2000:
+	if datetime.datetime.now().year < 2000:
 		container = eConsoleAppContainer()
 		if config.plugins.Stalker.ntpurl.value == '':
 			container.execute("ntpd -p 0.europe.pool.ntp.org -q")
@@ -224,7 +229,7 @@ def main(session, **kwargs):
 	top = open("/proc/stb/fb/dst_top", "r").read()
 	height = open("/proc/stb/fb/dst_height", "r").read()
 
-	if True: #datetime.datetime.now().year < 2000:
+	if datetime.datetime.now().year < 2000:
 		container = eConsoleAppContainer()
 		if config.plugins.Stalker.ntpurl.value == '':
 			container.execute("ntpd -p 0.europe.pool.ntp.org -q")
