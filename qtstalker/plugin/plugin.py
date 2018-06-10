@@ -24,7 +24,7 @@ config.plugins.Stalker.ntpurl = ConfigText(default = '')
 config.plugins.Stalker.showinextensions = ConfigYesNo(default = True)
 config.plugins.Stalker.showinmenu = ConfigYesNo(default = False)
 config.plugins.Stalker.autostart = ConfigYesNo(default = False)
-config.plugins.Stalker.boxkey = ConfigYesNo(default = False)
+config.plugins.Stalker.boxkey = ConfigYesNo(default = True)
 config.plugins.Stalker.preset = ConfigInteger(default = 0)
 config.plugins.Stalker.presets = ConfigSubList()
 NUMBER_OF_PRESETS = 6
