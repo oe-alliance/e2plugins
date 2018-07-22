@@ -61,10 +61,10 @@ class StalkerEdit(Screen, ConfigListScreen):
 		self.loadPortals()
 		addrs = netifaces.ifaddresses('eth0')
 		if config.plugins.Stalker.boxkey.value == True:
-			if_mac = "00:1a:79" + str(addrs[netifaces.AF_LINK][0]['addr'][8:])
+			if_mac = "A0:BB:3E" + str(addrs[netifaces.AF_LINK][0]['addr'][8:])
 		else:
 			if_mac = str(addrs[netifaces.AF_LINK][0]['addr'])
-		self["mac"] = StaticText(_("MAC: %s")% if_mac)
+		self["mac"] = StaticText(_("MAC: %s")% if_mac.upper())
 
 		self["HelpWindow"] = Pixmap()
 		self["HelpWindow"].hide()
