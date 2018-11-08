@@ -21,10 +21,10 @@ import datetime
 
 config.plugins.Stalker = ConfigSubsection()
 config.plugins.Stalker.ntpurl = ConfigText(default = '')
+config.plugins.Stalker.stalkermac = ConfigYesNo(default = True)
 config.plugins.Stalker.showinextensions = ConfigYesNo(default = True)
 config.plugins.Stalker.showinmenu = ConfigYesNo(default = False)
 config.plugins.Stalker.autostart = ConfigYesNo(default = False)
-config.plugins.Stalker.boxkey = ConfigYesNo(default = True)
 config.plugins.Stalker.preset = ConfigInteger(default = 0)
 config.plugins.Stalker.presets = ConfigSubList()
 NUMBER_OF_PRESETS = 6
@@ -56,20 +56,14 @@ class StalkerEdit(Screen, ConfigListScreen):
 		Screen.__init__(self, self.session)
 
 		self.list = []
-		ConfigListScreen.__init__(self, self.list, session = self.session)
+		ConfigListScreen.__init__(self, self.list, session = self.session, on_change = self.changedEntry)
 
 		self.loadPortals()
-		addrs = netifaces.ifaddresses('eth0')
-		if config.plugins.Stalker.boxkey.value == True:
-			if_mac = "00:1a:79" + str(addrs[netifaces.AF_LINK][0]['addr'][8:])
-		else:
-			if_mac = str(addrs[netifaces.AF_LINK][0]['addr'])
-		self["mac"] = StaticText(_("MAC: %s")% if_mac)
-
+		self["mac"] = StaticText()
+		self.setMac()
 		self["HelpWindow"] = Pixmap()
 		self["HelpWindow"].hide()
 		self["VKeyIcon"] = Boolean(False)
-
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Save"))
 		self["key_blue"] = StaticText("")
@@ -119,6 +113,18 @@ class StalkerEdit(Screen, ConfigListScreen):
 	def keyBlue(self):
 		if self.configfound:
 			self.session.openWithCallback(self.confirmationConfig, MessageBox, _("Install Stalker config?"))
+
+	def setMac(self):
+		addrs = netifaces.ifaddresses('eth0')
+		if config.plugins.Stalker.stalkermac.value == True:
+			if_mac = "00:1a:79" + str(addrs[netifaces.AF_LINK][0]['addr'][8:])
+		else:
+			if_mac = str(addrs[netifaces.AF_LINK][0]['addr'])
+		self["mac"].setText(_("MAC: %s")% if_mac)
+
+	def changedEntry(self):
+		if self["config"].getCurrent()[1] == config.plugins.Stalker.stalkermac:
+			self.setMac()
 
 	def KeyText(self):
 		if self["config"].getCurrentIndex() < NUMBER_OF_PRESETS:
@@ -171,7 +177,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 			else:
 				self.list.append(getConfigListEntry(_("Portal URL") + (" %d" % (x + 1)), self.name[x]))
 		self.list.append(getConfigListEntry(_("Start Stalker with enigma2 (Autostart)"), config.plugins.Stalker.autostart))
-		self.list.append(getConfigListEntry(_("Enable Stalker ministra support with unigue boxkey"), config.plugins.Stalker.boxkey))
+		self.list.append(getConfigListEntry(_("Use stalker mac"), config.plugins.Stalker.stalkermac))
 		self.list.append(getConfigListEntry(_("Show Stalker in Extensions"), config.plugins.Stalker.showinextensions))
 		self.list.append(getConfigListEntry(_("Show Stalker in Mainmenu"), config.plugins.Stalker.showinmenu))
 		self["config"].list = self.list
@@ -184,6 +190,9 @@ class StalkerEdit(Screen, ConfigListScreen):
 	def confirmationResult(self, result):
 		if result:
 			config.plugins.Stalker.preset.value = self["config"].getCurrentIndex()
+			for x in range(NUMBER_OF_PRESETS):
+				config.plugins.Stalker.presets[x].portal.value = self.name[x].value
+				config.plugins.Stalker.presets[x].save()
 			config.plugins.Stalker.save()
 			self.loadPortals()
 
