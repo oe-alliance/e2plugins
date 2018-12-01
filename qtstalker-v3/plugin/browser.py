@@ -28,7 +28,7 @@ class Browser:
 			datasocket.onCommandReceived.append(self.onCommandReceived)
 			datasocket.onBrowserClosed.append(self.onBrowserClosed)
 			container = eConsoleAppContainer()
-			shellFile = "export QT_QPA_PLATFORM=linuxfb; /usr/bin/stalker " + self.url
+			shellFile = "export QT_QPA_FONTDIR=/usr/share/fonts QT_QPA_PLATFORM=linuxfb; /usr/bin/stalker " + self.url
 			container.execute(shellFile)
 
 	def stop(self):

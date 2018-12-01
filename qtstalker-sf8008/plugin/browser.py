@@ -30,9 +30,9 @@ class Browser:
 			datasocket.onBrowserClosed.append(self.onBrowserClosed)
 			container = eConsoleAppContainer()
 			if config.plugins.Stalker.boxkey.value == True:
-				container.execute("export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb/0; export Q_MAC_USE_MAG=true; /usr/bin/stalker")
+				container.execute("export QT_QPA_FONTDIR=/usr/share/fonts QT_QPA_PLATFORM=linuxfb:fb=/dev/fb/0; export Q_MAC_USE_MAG=true; /usr/bin/stalker")
 			else:
-				container.execute("export QT_QPA_PLATFORM=linuxfb:fb=/dev/fb/0; /usr/bin/stalker")
+				container.execute("export QT_QPA_FONTDIR=/usr/share/fonts QT_QPA_PLATFORM=linuxfb:fb=/dev/fb/0; /usr/bin/stalker")
 
 	def stop(self):
 		if self.commandserver:
