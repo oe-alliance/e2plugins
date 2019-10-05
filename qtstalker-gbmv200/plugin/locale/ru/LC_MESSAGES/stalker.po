@@ -50,4 +50,4 @@ msgid "Install Stalker config?"
 msgstr "Установить настройки Сталкер?"
 
 msgid "Enable Stalker ministra support with unigue boxkey"
-msgstr "Включить поддержку Сталкер министра с помощью универсального boxkey"msgid ""
+msgstr "Включить поддержку Сталкер министра с помощью универсального boxkey"
