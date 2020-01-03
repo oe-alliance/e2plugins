@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import struct
 import os
 from twisted.internet.protocol import ServerFactory, Protocol
