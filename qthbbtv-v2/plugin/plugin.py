@@ -26,10 +26,11 @@ import re, os, sys, socket, time
 from Tools.Directories import fileExists, copyfile, pathExists, createDir
 from Components.ServicePosition import ServicePosition
 from Components.VolumeControl import VolumeControl
-import urllib
-import urllib2
 from .hbbtv import HbbTVWindow
 
+
+
+from six.moves import urllib
 
 
 class HBBTVParser(Screen):
