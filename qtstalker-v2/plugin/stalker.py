@@ -1,8 +1,9 @@
+from __future__ import absolute_import
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
 from Components.ServiceEventTracker import ServiceEventTracker
 from enigma import fbClass, eRCInput, gMainDC, getDesktop, eSize, eServiceReference, eTimer, iPlayableService, eDVBVolumecontrol
-from browser import Browser
+from .browser import Browser
 from Components.config import config
 import struct
 

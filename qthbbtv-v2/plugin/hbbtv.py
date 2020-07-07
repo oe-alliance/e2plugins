@@ -1,10 +1,11 @@
+from __future__ import absolute_import
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
 from Components.ServiceEventTracker import ServiceEventTracker
 from enigma import eTimer, iPlayableService
 import os
 from enigma import fbClass, eRCInput
-from browser import Browser
+from .browser import Browser
 from enigma import fbClass, eRCInput, eServiceReference
 import struct
 
@@ -112,7 +113,7 @@ class HbbTVWindow(Screen):
 		browserinstance.onPausePlaying.remove(self.onPausePlaying)
 		browserinstance.onResumePlaying.remove(self.onResumePlaying)
 		browserinstance.onSkip.remove(self.onSkip)
-		browserinstance.setPosition(0, 0, self.width, self.height,0)
+		browserinstance.setPosition(0, 0, self.width, self.height, 0)
 		self.mediatimer.stop()
 		global g_session
 		g_session.nav.playService(self.lastservice)

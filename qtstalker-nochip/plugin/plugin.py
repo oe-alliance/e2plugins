@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from . import _
 from Components.ActionMap import NumberActionMap, ActionMap
 from Components.ConfigList import ConfigListScreen
@@ -13,7 +14,7 @@ from Plugins.Plugin import PluginDescriptor
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Screens.VirtualKeyBoard import VirtualKeyBoard
-from stalker import StalkerTVWindow
+from .stalker import StalkerTVWindow
 import os
 import netifaces
 import datetime
@@ -140,20 +141,20 @@ class StalkerEdit(Screen, ConfigListScreen):
 	def selectionChanged(self):
 		if self["config"].getCurrent():
 			if isinstance(self["config"].getCurrent()[1], ConfigText):
-				if self.has_key("VKeyIcon"):
+				if "VKeyIcon" in self:
 					self["VirtualKB"].setEnabled(True)
 					self["VKeyIcon"].boolean = True
-				if self.has_key("HelpWindow"):
+				if "HelpWindow" in self:
 					if self["config"].getCurrent()[1].help_window and self["config"].getCurrent()[1].help_window.instance is not None:
 						helpwindowpos = self["HelpWindow"].getPosition()
 						from enigma import ePoint
-						self["config"].getCurrent()[1].help_window.instance.move(ePoint(helpwindowpos[0],helpwindowpos[1]))
+						self["config"].getCurrent()[1].help_window.instance.move(ePoint(helpwindowpos[0], helpwindowpos[1]))
 					else:
-						if self.has_key("VKeyIcon"):
+						if "VKeyIcon" in self:
 							self["VirtualKB"].setEnabled(False)
 							self["VKeyIcon"].boolean = False
 		else:
-			if self.has_key("VKeyIcon"):
+			if "VKeyIcon" in self:
 				self["VirtualKB"].setEnabled(False)
 				self["VKeyIcon"].boolean = False
 

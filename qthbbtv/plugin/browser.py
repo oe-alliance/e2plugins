@@ -1,8 +1,9 @@
+from __future__ import absolute_import
 import os
 import struct
 from enigma import eConsoleAppContainer, getDesktop
 from Components.VolumeControl import VolumeControl
-import datasocket
+from . import datasocket
 
 
 class Browser:
@@ -55,7 +56,7 @@ class Browser:
 				x()
 		elif cmd == 1005:
 			x, y, w, h = struct.unpack('!IIII', data)
-			self.setPosition(x, y, w, h,1)
+			self.setPosition(x, y, w, h, 1)
 		elif cmd == 1006:
 			for x in self.onSkip:
 				x(struct.unpack('!I', data))

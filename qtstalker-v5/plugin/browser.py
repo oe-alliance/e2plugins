@@ -1,8 +1,9 @@
+from __future__ import absolute_import
 import os
 import struct
 from enigma import eConsoleAppContainer, getDesktop
 from Components.VolumeControl import VolumeControl
-import datasocket
+from . import datasocket
 
 
 class Browser:
