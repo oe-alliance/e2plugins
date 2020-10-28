@@ -4,7 +4,7 @@ import struct
 from enigma import eConsoleAppContainer, getDesktop
 from Components.VolumeControl import VolumeControl
 from . import datasocket
-
+import six
 
 class Browser:
 	def __init__(self):
@@ -53,7 +53,7 @@ class Browser:
 				x()
 		elif cmd == 1005:
 			for x in self.onSkip:
-				x(struct.unpack('I', data))
+				x(struct.unpack('I', data).encode())
 		elif cmd == 1100:
 			VolumeControl.instance and VolumeControl.instance.volUp()
 		elif cmd == 1101:
@@ -71,10 +71,10 @@ class Browser:
 
 	def sendCommand(self, cmd, data = ''):
 		if self.commandserver is not None:
-			self.commandserver.sendCommand(cmd, data)
+			self.commandserver.sendCommand(cmd, six.ensure_binary(data))
 
 	def setUrl(self, url):
-		self.url = url
+		self.url = six.ensure_binary(url)
 
 	def StopMediaPlayback(self):
 		self.sendCommand(5)
