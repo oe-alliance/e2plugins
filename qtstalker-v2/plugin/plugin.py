@@ -1,5 +1,11 @@
 from __future__ import absolute_import
+
 from . import _
+import os
+import netifaces
+import datetime
+from enigma import iServiceInformation, eTimer, eConsoleAppContainer
+
 from Components.ActionMap import NumberActionMap, ActionMap
 from Components.ConfigList import ConfigListScreen
 from Components.config import config, ConfigSubList, ConfigSubsection, ConfigYesNo, getConfigListEntry, ConfigInteger, ConfigText
@@ -9,19 +15,16 @@ from Components.PluginComponent import plugins
 from Components.Sources.StaticText import StaticText
 from Components.Sources.Boolean import Boolean
 from Components.Pixmap import Pixmap
-from enigma import iServiceInformation, eTimer, eConsoleAppContainer
 from Plugins.Plugin import PluginDescriptor
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from .stalker import StalkerTVWindow
-import os
-import netifaces
-import datetime
+
 
 
 config.plugins.Stalker = ConfigSubsection()
-config.plugins.Stalker.ntpurl = ConfigText(default = '')
+config.plugins.Stalker.ntpurl = ConfigText(default = "")
 config.plugins.Stalker.stalkermac = ConfigYesNo(default = True)
 config.plugins.Stalker.showinextensions = ConfigYesNo(default = True)
 config.plugins.Stalker.showinmenu = ConfigYesNo(default = False)
@@ -31,7 +34,7 @@ config.plugins.Stalker.presets = ConfigSubList()
 NUMBER_OF_PRESETS = 6
 for x in range(NUMBER_OF_PRESETS):
 	preset = ConfigSubsection()
-	preset.portal = ConfigText(default = 'http://')
+	preset.portal = ConfigText(default = "http://")
 	config.plugins.Stalker.presets.append(preset)
 
 
@@ -70,7 +73,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 		self["key_blue"] = StaticText("")
 		self.configfound = False
 
-		self["actions"] = NumberActionMap(["SetupActions", "ColorActions", 'VirtualKeyboardActions'],
+		self["actions"] = NumberActionMap(["SetupActions", "ColorActions", "VirtualKeyboardActions"],
 		{
 			"ok": self.ok,
 			"back": self.close,
@@ -95,12 +98,12 @@ class StalkerEdit(Screen, ConfigListScreen):
 		self.setupTimer.stop()
 		parts = [ (r.tabbedDescription(), r.mountpoint, self.session) for r in harddiskmanager.getMountedPartitions(onlyhotplug = False) if os.access(r.mountpoint, os.F_OK|os.R_OK) ]
 		for p in parts:
-			if p[1] == '/':
+			if p[1] == "/":
 				continue
 			for root, dirs, files in os.walk(p[1]):
 				for f in files:
 					self.path = os.path.join(root, f)
-					if '.stalkerconfig' in self.path:
+					if ".stalkerconfig" in self.path:
 						self.configfound = True
 						self["key_blue"].setText(_("Load Settings"))
 						return
@@ -135,14 +138,14 @@ class StalkerEdit(Screen, ConfigListScreen):
 		if result:
 			data = open(self.path, "r").read()
 			if len(data):
-				data = data.split('\n')
+				data = data.split("\n")
 				for x in data:
-					y = x.split(' ')
+					y = x.split(" ")
 					if len(y) == 2:
-						if y[0] == 'ntp':
+						if y[0] == "ntp":
 							config.plugins.Stalker.ntpurl.value = y[1]
 					if len(y) == 3:
-						if y[0] == 'portal':
+						if y[0] == "portal":
 							config.plugins.Stalker.presets[int(y[1])].portal.value = y[2]
 							config.plugins.Stalker.presets[int(y[1])].save()
 				config.plugins.Stalker.save()
@@ -191,7 +194,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 	def confirmationResult(self, result):
 		if result:
 			config.plugins.Stalker.preset.value = self["config"].getCurrentIndex()
-			for x in range(NUMBER_OF_PRESETS):
+			for x in list(range(NUMBER_OF_PRESETS)):
 				config.plugins.Stalker.presets[x].portal.value = self.name[x].value
 				config.plugins.Stalker.presets[x].save()
 			config.plugins.Stalker.save()
@@ -226,7 +229,7 @@ def timerCallback():
 
 	if datetime.datetime.now().year < 2000:
 		container = eConsoleAppContainer()
-		if config.plugins.Stalker.ntpurl.value == '':
+		if config.plugins.Stalker.ntpurl.value == "":
 			container.execute("ntpd -p 0.europe.pool.ntp.org -q")
 		else:
 			container.execute("ntpd -p %s -q" % (config.plugins.Stalker.ntpurl.value))
@@ -241,7 +244,7 @@ def main(session, **kwargs):
 
 	if datetime.datetime.now().year < 2000:
 		container = eConsoleAppContainer()
-		if config.plugins.Stalker.ntpurl.value == '':
+		if config.plugins.Stalker.ntpurl.value == "":
 			container.execute("ntpd -p 0.europe.pool.ntp.org -q")
 		else:
 			container.execute("ntpd -p %s -q" % (config.plugins.Stalker.ntpurl.value))
@@ -257,11 +260,11 @@ def startMenu(menuid):
 def Plugins(**kwargs):
 	from enigma import getDesktop
 	if getDesktop(0).size().width() <= 1280:
-		stalker = 'stalker_HD.png'
+		stalker = "stalker_HD.png"
 	else:
-		stalker = 'stalker_FHD.png'
+		stalker = "stalker_FHD.png"
 	menus = []
-	menus.append(PluginDescriptor(name=_('Stalker Setup'), description=_('Stalker Setup'), where=PluginDescriptor.WHERE_PLUGINMENU, icon=stalker, fnc=setup))
+	menus.append(PluginDescriptor(name=_("Stalker Setup"), description=_("Stalker Setup"), where=PluginDescriptor.WHERE_PLUGINMENU, icon=stalker, fnc=setup))
 	if config.plugins.Stalker.showinextensions.value:
 		menus.append(PluginDescriptor(name= _("Stalker"), description = _("Stalker"), where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main))
 	if config.plugins.Stalker.showinmenu.value:
