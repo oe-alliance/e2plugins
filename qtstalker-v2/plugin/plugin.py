@@ -157,7 +157,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 					if self["config"].getCurrent()[1].help_window and self["config"].getCurrent()[1].help_window.instance is not None:
 						helpwindowpos = self["HelpWindow"].getPosition()
 						from enigma import ePoint
-						self["config"].getCurrent()[1].help_window.instance.move(ePoint(helpwindowpos[0],helpwindowpos[1]))
+						self["config"].getCurrent()[1].help_window.instance.move(ePoint(helpwindowpos[0], helpwindowpos[1]))
 					else:
 						if self.has_key("VKeyIcon"):
 							self["VirtualKB"].setEnabled(False)
