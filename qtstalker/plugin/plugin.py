@@ -64,7 +64,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 			if_mac = "00:1a:79" + str(addrs[netifaces.AF_LINK][0]['addr'][8:])
 		else:
 			if_mac = str(addrs[netifaces.AF_LINK][0]['addr'])
-		self["mac"] = StaticText(_("MAC: %s")% if_mac)
+		self["mac"] = StaticText(_("MAC: %s") % if_mac)
 
 		self["HelpWindow"] = Pixmap()
 		self["HelpWindow"].hide()
@@ -98,7 +98,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 
 	def setupCallback(self):
 		self.setupTimer.stop()
-		parts = [(r.tabbedDescription(), r.mountpoint, self.session) for r in harddiskmanager.getMountedPartitions(onlyhotplug=False) if os.access(r.mountpoint, os.F_OK|os.R_OK)]
+		parts = [(r.tabbedDescription(), r.mountpoint, self.session) for r in harddiskmanager.getMountedPartitions(onlyhotplug=False) if os.access(r.mountpoint, os.F_OK | os.R_OK)]
 		for p in parts:
 			if p[1] == '/':
 				continue
