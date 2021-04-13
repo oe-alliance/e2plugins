@@ -20,17 +20,17 @@ import datetime
 
 
 config.plugins.Stalker = ConfigSubsection()
-config.plugins.Stalker.ntpurl = ConfigText(default = '')
-config.plugins.Stalker.showinextensions = ConfigYesNo(default = True)
-config.plugins.Stalker.showinmenu = ConfigYesNo(default = False)
-config.plugins.Stalker.autostart = ConfigYesNo(default = False)
-config.plugins.Stalker.boxkey = ConfigYesNo(default = True)
-config.plugins.Stalker.preset = ConfigInteger(default = 0)
+config.plugins.Stalker.ntpurl = ConfigText(default='')
+config.plugins.Stalker.showinextensions = ConfigYesNo(default=True)
+config.plugins.Stalker.showinmenu = ConfigYesNo(default=False)
+config.plugins.Stalker.autostart = ConfigYesNo(default=False)
+config.plugins.Stalker.boxkey = ConfigYesNo(default=True)
+config.plugins.Stalker.preset = ConfigInteger(default=0)
 config.plugins.Stalker.presets = ConfigSubList()
 NUMBER_OF_PRESETS = 6
 for x in range(NUMBER_OF_PRESETS):
 	preset = ConfigSubsection()
-	preset.portal = ConfigText(default = 'http://')
+	preset.portal = ConfigText(default='http://')
 	config.plugins.Stalker.presets.append(preset)
 
 
@@ -56,7 +56,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 		Screen.__init__(self, self.session)
 
 		self.list = []
-		ConfigListScreen.__init__(self, self.list, session = self.session)
+		ConfigListScreen.__init__(self, self.list, session=self.session)
 
 		self.loadPortals()
 		addrs = netifaces.ifaddresses('eth0')
@@ -64,7 +64,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 			if_mac = "00:1a:79" + str(addrs[netifaces.AF_LINK][0]['addr'][8:])
 		else:
 			if_mac = str(addrs[netifaces.AF_LINK][0]['addr'])
-		self["mac"] = StaticText(_("MAC: %s")% if_mac)
+		self["mac"] = StaticText(_("MAC: %s") % if_mac)
 
 		self["HelpWindow"] = Pixmap()
 		self["HelpWindow"].hide()
@@ -98,7 +98,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 
 	def setupCallback(self):
 		self.setupTimer.stop()
-		parts = [ (r.tabbedDescription(), r.mountpoint, self.session) for r in harddiskmanager.getMountedPartitions(onlyhotplug = False) if os.access(r.mountpoint, os.F_OK|os.R_OK) ]
+		parts = [(r.tabbedDescription(), r.mountpoint, self.session) for r in harddiskmanager.getMountedPartitions(onlyhotplug=False) if os.access(r.mountpoint, os.F_OK | os.R_OK)]
 		for p in parts:
 			if p[1] == '/':
 				continue
@@ -111,7 +111,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 						return
 					del dirs[:]
 
-	def VirtualKeyBoardCallback(self, callback = None):
+	def VirtualKeyBoardCallback(self, callback=None):
 		if callback is not None and len(callback):
 			self["config"].getCurrent()[1].setValue(callback)
 			self["config"].invalidate(self["config"].getCurrent())
@@ -122,7 +122,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 
 	def KeyText(self):
 		if self["config"].getCurrentIndex() < NUMBER_OF_PRESETS:
-			self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title = self["config"].getCurrent()[0], text = self["config"].getCurrent()[1].value)
+			self.session.openWithCallback(self.VirtualKeyBoardCallback, VirtualKeyBoard, title=self["config"].getCurrent()[0], text=self["config"].getCurrent()[1].value)
 
 	def confirmationConfig(self, result):
 		if result:
@@ -151,7 +151,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 					if self["config"].getCurrent()[1].help_window and self["config"].getCurrent()[1].help_window.instance is not None:
 						helpwindowpos = self["HelpWindow"].getPosition()
 						from enigma import ePoint
-						self["config"].getCurrent()[1].help_window.instance.move(ePoint(helpwindowpos[0],helpwindowpos[1]))
+						self["config"].getCurrent()[1].help_window.instance.move(ePoint(helpwindowpos[0], helpwindowpos[1]))
 					else:
 						if self.has_key("VKeyIcon"):
 							self["VirtualKB"].setEnabled(False)
@@ -165,7 +165,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 		self.list = []
 		self.name = []
 		for x in range(NUMBER_OF_PRESETS):
-			self.name.append(ConfigText(default = config.plugins.Stalker.presets[x].portal.value, fixed_size = False))
+			self.name.append(ConfigText(default=config.plugins.Stalker.presets[x].portal.value, fixed_size=False))
 			if config.plugins.Stalker.preset.value == x:
 				self.list.append(getConfigListEntry(">> " + _("Portal URL") + (" %d" % (x + 1)), self.name[x]))
 			else:
@@ -194,8 +194,10 @@ class StalkerEdit(Screen, ConfigListScreen):
 		config.plugins.Stalker.save()
 		self.close()
 
+
 def setup(session, **kwargs):
 	session.open(StalkerEdit)
+
 
 def autostart(session, **kwargs):
 	global g_timerinstance
@@ -204,6 +206,7 @@ def autostart(session, **kwargs):
 	g_timerinstance = eTimer()
 	g_timerinstance.callback.append(timerCallback)
 	g_timerinstance.start(1000)
+
 
 def timerCallback():
 	global g_timerinstance
@@ -223,6 +226,7 @@ def timerCallback():
 
 	g_session.open(StalkerTVWindow, left, top, width, height)
 
+
 def main(session, **kwargs):
 	left = open("/proc/stb/fb/dst_left", "r").read()
 	width = open("/proc/stb/fb/dst_width", "r").read()
@@ -237,6 +241,7 @@ def main(session, **kwargs):
 			container.execute("ntpd -p %s -q" % (config.plugins.Stalker.ntpurl.value))
 
 	session.open(StalkerTVWindow, left, top, width, height)
+
 
 def startMenu(menuid):
 	if menuid != "mainmenu":
@@ -253,9 +258,9 @@ def Plugins(**kwargs):
 	menus = []
 	menus.append(PluginDescriptor(name=_('Stalker Setup'), description=_('Stalker Setup'), where=PluginDescriptor.WHERE_PLUGINMENU, icon=stalker, fnc=setup))
 	if config.plugins.Stalker.showinextensions.value:
-		menus.append(PluginDescriptor(name= _("Stalker"), description = _("Stalker"), where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main))
+		menus.append(PluginDescriptor(name=_("Stalker"), description=_("Stalker"), where=PluginDescriptor.WHERE_EXTENSIONSMENU, fnc=main))
 	if config.plugins.Stalker.showinmenu.value:
-		menus.append(PluginDescriptor(name=_("Stalker"), description = _("Stalker"), where = PluginDescriptor.WHERE_MENU, fnc = startMenu))
+		menus.append(PluginDescriptor(name=_("Stalker"), description=_("Stalker"), where=PluginDescriptor.WHERE_MENU, fnc=startMenu))
 	if config.plugins.Stalker.autostart.value:
 		menus.append(PluginDescriptor(where=PluginDescriptor.WHERE_SESSIONSTART, fnc=autostart))
 	return menus
