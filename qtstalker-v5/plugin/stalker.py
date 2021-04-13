@@ -15,7 +15,7 @@ class StalkerTVWindow(Screen):
 		<screen name="StalkerTVWindow" position="0,0" size="1280,720" backgroundColor="transparent" flags="wfNoBorder" title="Stalker Plugin">
 		</screen>
 		"""
-	def __init__(self, session, left = 0, top = 0, width = 0, height = 0):
+	def __init__(self, session, left=0, top=0, width=0, height=0):
 		Screen.__init__(self, session)
 
 		global g_session
@@ -71,8 +71,7 @@ class StalkerTVWindow(Screen):
 		browserinstance.onResumePlaying.append(self.onResumePlaying)
 		browserinstance.onSkip.append(self.onSkip)
 
-		self.__event_tracker = ServiceEventTracker(screen=self, eventmap=
-		{
+		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
 			iPlayableService.evStart: self.serviceStarted,
 			iPlayableService.evStopped: self.serviceStopped,
 			iPlayableService.evEOF: self.serviceEOF,
