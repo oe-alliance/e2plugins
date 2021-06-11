@@ -140,19 +140,24 @@ class StalkerEdit(Screen, ConfigListScreen):
 
 	def selectionChanged(self):
 		if self["config"].getCurrent():
-			if isinstance(self["config"].getCurrent()[1], ConfigText):
+			try:
+				if isinstance(self["config"].getCurrent()[1], ConfigText):
+					if "VKeyIcon" in self:
+						self["VirtualKB"].setEnabled(True)
+						self["VKeyIcon"].boolean = True
+					if "HelpWindow" in self:
+						if self["config"].getCurrent()[1].help_window and self["config"].getCurrent()[1].help_window.instance is not None:
+							helpwindowpos = self["HelpWindow"].getPosition()
+							from enigma import ePoint
+							self["config"].getCurrent()[1].help_window.instance.move(ePoint(helpwindowpos[0], helpwindowpos[1]))
+						else:
+							if "VKeyIcon" in self:
+								self["VirtualKB"].setEnabled(False)
+								self["VKeyIcon"].boolean = False
+			except:
 				if "VKeyIcon" in self:
-					self["VirtualKB"].setEnabled(True)
-					self["VKeyIcon"].boolean = True
-				if "HelpWindow" in self:
-					if self["config"].getCurrent()[1].help_window and self["config"].getCurrent()[1].help_window.instance is not None:
-						helpwindowpos = self["HelpWindow"].getPosition()
-						from enigma import ePoint
-						self["config"].getCurrent()[1].help_window.instance.move(ePoint(helpwindowpos[0], helpwindowpos[1]))
-					else:
-						if "VKeyIcon" in self:
-							self["VirtualKB"].setEnabled(False)
-							self["VKeyIcon"].boolean = False
+					self["VirtualKB"].setEnabled(False)
+					self["VKeyIcon"].boolean = False
 		else:
 			if "VKeyIcon" in self:
 				self["VirtualKB"].setEnabled(False)
