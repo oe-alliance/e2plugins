@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-
 from . import _
 import os
 import netifaces
@@ -21,14 +20,13 @@ from Screens.MessageBox import MessageBox
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from .stalker import StalkerTVWindow
 
-
-
 config.plugins.Stalker = ConfigSubsection()
 config.plugins.Stalker.ntpurl = ConfigText(default = "")
-config.plugins.Stalker.stalkermac = ConfigYesNo(default = True)
+config.plugins.Stalker.stalkermac = ConfigYesNo(default = False)
 config.plugins.Stalker.showinextensions = ConfigYesNo(default = True)
 config.plugins.Stalker.showinmenu = ConfigYesNo(default = False)
 config.plugins.Stalker.autostart = ConfigYesNo(default = False)
+config.plugins.Stalker.portalv2 = ConfigYesNo(default = False)
 config.plugins.Stalker.preset = ConfigInteger(default = 0)
 config.plugins.Stalker.presets = ConfigSubList()
 NUMBER_OF_PRESETS = 6
@@ -70,7 +68,7 @@ class StalkerEdit(Screen, ConfigListScreen):
 		self["VKeyIcon"] = Boolean(False)
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Save"))
-		self["key_blue"] = StaticText("")
+		self["key_blue"] = StaticText("USB")
 		self.configfound = False
 
 		self["actions"] = NumberActionMap(["SetupActions", "ColorActions", "VirtualKeyboardActions"],
@@ -117,6 +115,8 @@ class StalkerEdit(Screen, ConfigListScreen):
 	def keyBlue(self):
 		if self.configfound:
 			self.session.openWithCallback(self.confirmationConfig, MessageBox, _("Install Stalker config?"))
+		else:
+			self.session.open(MessageBox, _("No stalker config file found"), MessageBox.TYPE_INFO, timeout=10)
 
 	def setMac(self):
 		addrs = netifaces.ifaddresses('eth0')
@@ -186,9 +186,10 @@ class StalkerEdit(Screen, ConfigListScreen):
 			else:
 				self.list.append(getConfigListEntry(_("Portal URL") + (" %d" % (x + 1)), self.name[x]))
 		self.list.append(getConfigListEntry(_("Start Stalker with enigma2 (Autostart)"), config.plugins.Stalker.autostart))
-		self.list.append(getConfigListEntry(_("Use stalker mac"), config.plugins.Stalker.stalkermac))
 		self.list.append(getConfigListEntry(_("Show Stalker in Extensions"), config.plugins.Stalker.showinextensions))
 		self.list.append(getConfigListEntry(_("Show Stalker in Mainmenu"), config.plugins.Stalker.showinmenu))
+		self.list.append(getConfigListEntry(_("Use stalker mac"), config.plugins.Stalker.stalkermac))
+		self.list.append(getConfigListEntry(_("New gen portal"), config.plugins.Stalker.portalv2))
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
@@ -261,14 +262,13 @@ def startMenu(menuid):
 		return []
 	return [(_("Stalker"), main, "Stalker Plugin", 80)]
 
-
 def Plugins(**kwargs):
+	menus = []
 	from enigma import getDesktop
 	if getDesktop(0).size().width() <= 1280:
 		stalker = "stalker_HD.png"
 	else:
 		stalker = "stalker_FHD.png"
-	menus = []
 	menus.append(PluginDescriptor(name=_("Stalker Setup"), description=_("Stalker Setup"), where=PluginDescriptor.WHERE_PLUGINMENU, icon=stalker, fnc=setup))
 	if config.plugins.Stalker.showinextensions.value:
 		menus.append(PluginDescriptor(name= _("Stalker"), description = _("Stalker"), where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc = main))

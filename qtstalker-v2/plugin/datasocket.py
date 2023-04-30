@@ -16,7 +16,7 @@ class ClientConnection(Protocol):
 	cmd = 0
 
 	def dataReceived(self, data):
-		self.data += data
+		self.data = self.data + data
 		while len(self.data):
 			if self.datasize == 0:
 				if len(self.data) >= self.headersize:
@@ -68,6 +68,8 @@ class CommandServer:
 		for client in browserclients:
 			client.transport.write(struct.pack("!III", client.magic, cmd, len(data)))
 			if len(data):
+				if type(data) is not bytes:
+					data = data.encode()
 				client.transport.write(data)
 
 	def connectedClients(self):
