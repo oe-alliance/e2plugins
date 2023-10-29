@@ -82,6 +82,8 @@ class Browser:
 	def setPosition(self, dst_left, dst_top, dst_width, dst_height):
 		width = 1280
 		height = 720
+		dst_width = int(dst_width, 16)
+		dst_height = int(dst_height, 16)
 		if dst_width == -1:
 			dst_width = 1280
 		if dst_height == -1:
