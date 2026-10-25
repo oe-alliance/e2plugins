@@ -1,36 +1,13 @@
-from __future__ import absolute_import
-from __future__ import print_function
-from Plugins.Plugin import PluginDescriptor
-from Components.PluginComponent import plugins
-from Screens.Screen import Screen
-from Screens.VirtualKeyBoard import VirtualKeyBoard
-from Components.ActionMap import ActionMap, NumberActionMap, HelpableActionMap
-from GlobalActions import globalActionMap
-from Components.Label import Label, MultiColorLabel
-from Components.Button import Button
-from Components.MenuList import MenuList
-from Components.ConfigList import ConfigListScreen
-from Components.config import config, ConfigSubsection, ConfigPosition, getConfigListEntry, ConfigBoolean, ConfigInteger, ConfigText, ConfigSelection, configfile
-from Components.Sources.StaticText import StaticText
-from Components.Task import Task
-from enigma import eTimer, eServiceReference, iPlayableService, iServiceInformation, getDesktop, eRCInput, eServiceCenter, fbClass
+from __future__ import absolute_import, print_function
+
+from enigma import iPlayableService, iServiceInformation
+
 from Components.ServiceEventTracker import ServiceEventTracker
-from Screens.ChoiceBox import ChoiceBox
-from Screens.InputBox import InputBox
-from Screens.MessageBox import MessageBox
+from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBar import InfoBar
-from Screens.InfoBarGenerics import InfoBarAudioSelection, InfoBarSubtitleSupport, InfoBarTeletextPlugin, InfoBarRedButton
-from Screens.ChannelSelection import service_types_tv
-from Screens.LocationBox import MovieLocationBox
-import re, os, sys, socket, time
-from Tools.Directories import fileExists, copyfile, pathExists, createDir
-from Components.ServicePosition import ServicePosition
-from Components.VolumeControl import VolumeControl
+from Screens.Screen import Screen
+
 from .hbbtv import HbbTVWindow
-
-
-
-from six.moves import urllib
 
 
 class HBBTVParser(Screen):
@@ -39,7 +16,6 @@ class HBBTVParser(Screen):
 		Screen.__init__(self, session)
 		self.session = session
 		self.started = False
-		from Components.ServiceEventTracker import ServiceEventTracker
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap={iPlayableService.evStart: self.serviceStarted})
 		self.openUrl = False
 
@@ -51,9 +27,17 @@ class HBBTVParser(Screen):
 			self.started = True
 
 	def onHBBTVActivation(self):
+		self.openUrl = False
 		service = self.session.nav.getCurrentService()
 		info = service and service.info()
+		# An earlier red-button callback may already have stopped the service.
+		if info is None:
+			print("[QtHbbtv] Ignoring activation: no current service information.")
+			return
 		startUrl = info.getInfoString(iServiceInformation.sHBBTVUrl)
+		if not startUrl:
+			print("[QtHbbtv] Ignoring activation: no HbbTV application URL.")
+			return
 		width = info and info.getInfo(iServiceInformation.sVideoWidth) or -1
 		height = info and info.getInfo(iServiceInformation.sVideoHeight) or -1
 		pmt = info and info.getInfo(iServiceInformation.sPMTPID) or -1
@@ -67,15 +51,13 @@ class HBBTVParser(Screen):
 		ait = info.getAITApplications()
 
 		self.openUrl = startUrl
-		if not self.openUrl:
-			self.close()
-			return
 		self.session.open(HbbTVWindow, self.openUrl, pmt, tsid, onid, ssid, width, height, ait)
 
+
 def autostart(reason, **kwargs):
-	global globalinstance
 	if 'session' in kwargs:
 		HBBTVParser(kwargs['session'])
+
 
 def Plugins(**kwargs):
 	return PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart)
